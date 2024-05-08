@@ -1,14 +1,15 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   StyleSheet,
   ViewStyle,
   KeyboardAvoidingView,
   Platform,
-  Dimensions, SafeAreaView,
-} from "react-native";
-import Toast, { ToastOptions, ToastProps } from "./toast";
+  Dimensions,
+  SafeAreaView,
+} from 'react-native';
+import Toast, { ToastOptions, ToastProps } from './toast';
 
-const { height, width } = Dimensions.get("window");
+const { height, width } = Dimensions.get('window');
 
 export interface Props extends ToastOptions {
   renderToast?(toast: ToastProps): JSX.Element;
@@ -16,6 +17,7 @@ export interface Props extends ToastOptions {
   offset?: number;
   offsetTop?: number;
   offsetBottom?: number;
+  offsetRight?: number;
   swipeEnabled?: boolean;
 }
 
@@ -32,8 +34,9 @@ class ToastContainer extends Component<Props, State> {
   }
 
   static defaultProps: Props = {
-    placement: "bottom",
+    placement: 'bottom',
     offset: 10,
+    offsetRight: 10,
     swipeEnabled: true,
   };
 
@@ -107,7 +110,7 @@ class ToastContainer extends Component<Props, State> {
    */
   isOpen = (id: string) => {
     return this.state.toasts.some((t) => t.id === id && t.open);
-  }
+  };
 
   renderBottomToasts() {
     const { toasts } = this.state;
@@ -115,18 +118,48 @@ class ToastContainer extends Component<Props, State> {
     let style: ViewStyle = {
       bottom: offsetBottom || offset,
       width: width,
-      justifyContent: "flex-end",
-      flexDirection: "column",
+      justifyContent: 'flex-end',
+      flexDirection: 'column',
     };
     return (
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "position" : undefined}
+        behavior={Platform.OS === 'ios' ? 'position' : undefined}
         style={[styles.container, style]}
-        pointerEvents="box-none"
+        pointerEvents='box-none'
       >
         <SafeAreaView>
           {toasts
-            .filter((t) => !t.placement || t.placement === "bottom")
+            .filter((t) => !t.placement || t.placement === 'bottom')
+            .map((toast) => (
+              <Toast key={toast.id} {...toast} />
+            ))}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+    );
+  }
+
+  renderTopRightToasts() {
+    const { toasts } = this.state;
+    let { offset, offsetTop, offsetRight } = this.props;
+    let style: ViewStyle = {
+      top: offsetTop || offset,
+      right: offsetRight || offset,
+      width: width,
+      justifyContent: 'flex-start',
+      flexDirection: 'column-reverse',
+    };
+    let contentStyle: ViewStyle = {
+      alignSelf: 'flex-end',
+    };
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'position' : undefined}
+        style={[styles.container, style]}
+        pointerEvents='box-none'
+      >
+        <SafeAreaView style={contentStyle}>
+          {toasts
+            .filter((t) => t.placement === 'top right')
             .map((toast) => (
               <Toast key={toast.id} {...toast} />
             ))}
@@ -141,18 +174,18 @@ class ToastContainer extends Component<Props, State> {
     let style: ViewStyle = {
       top: offsetTop || offset,
       width: width,
-      justifyContent: "flex-start",
-      flexDirection: "column-reverse",
+      justifyContent: 'flex-start',
+      flexDirection: 'column-reverse',
     };
     return (
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "position" : undefined}
+        behavior={Platform.OS === 'ios' ? 'position' : undefined}
         style={[styles.container, style]}
-        pointerEvents="box-none"
+        pointerEvents='box-none'
       >
         <SafeAreaView>
           {toasts
-            .filter((t) => t.placement === "top")
+            .filter((t) => t.placement === 'top')
             .map((toast) => (
               <Toast key={toast.id} {...toast} />
             ))}
@@ -168,23 +201,23 @@ class ToastContainer extends Component<Props, State> {
       top: offsetTop || offset,
       height: height,
       width: width,
-      justifyContent: "center",
-      flexDirection: "column-reverse",
+      justifyContent: 'center',
+      flexDirection: 'column-reverse',
     };
 
-    const data = toasts.filter((t) => t.placement === "center");
+    const data = toasts.filter((t) => t.placement === 'center');
     const foundToast = data.length > 0;
 
     if (!foundToast) return null;
 
     return (
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "position" : undefined}
+        behavior={Platform.OS === 'ios' ? 'position' : undefined}
         style={[styles.container, style]}
-        pointerEvents="box-none"
+        pointerEvents='box-none'
       >
         {toasts
-          .filter((t) => t.placement === "center")
+          .filter((t) => t.placement === 'center')
           .map((toast) => (
             <Toast key={toast.id} {...toast} />
           ))}
@@ -195,6 +228,7 @@ class ToastContainer extends Component<Props, State> {
   render() {
     return (
       <>
+        {this.renderTopRightToasts()}
         {this.renderTopToasts()}
         {this.renderBottomToasts()}
         {this.renderCenterToasts()}
@@ -207,15 +241,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 0,
     // @ts-ignore: fixed is available on web.
-    position: Platform.OS === "web" ? "fixed" : "absolute",
-    maxWidth: "100%",
+    position: Platform.OS === 'web' ? 'fixed' : 'absolute',
+    maxWidth: '100%',
     zIndex: 999999,
     elevation: 999999,
     alignSelf: 'center',
-    ...(Platform.OS === "web" ? { overflow: "hidden", userSelect: 'none' } : null),
+    ...(Platform.OS === 'web'
+      ? { overflow: 'hidden', userSelect: 'none' }
+      : null),
   },
   message: {
-    color: "#333",
+    color: '#333',
   },
 });
 

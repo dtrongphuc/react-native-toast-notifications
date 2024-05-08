@@ -1,4 +1,4 @@
-import React, { FC, useRef, useEffect, useState } from "react";
+import React, { FC, useRef, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,13 +7,13 @@ import {
   ViewStyle,
   TextStyle,
   Text,
-  TouchableWithoutFeedback,
   PanResponder,
   PanResponderInstance,
   PanResponderGestureState,
   Platform,
-} from "react-native";
-import { useDimensions } from "./utils/useDimensions";
+  Pressable,
+} from 'react-native';
+import { useDimensions } from './utils/useDimensions';
 
 export interface ToastOptions {
   /**
@@ -29,7 +29,7 @@ export interface ToastOptions {
   /**
    * Toast types, You can implement your custom types with JSX using renderType method on ToastContainer.
    */
-  type?: "normal" | "success" | "danger" | "warning" | string;
+  type?: 'normal' | 'success' | 'danger' | 'warning' | string;
 
   /**
    * In ms, How long toast will stay before it go away
@@ -39,7 +39,7 @@ export interface ToastOptions {
   /**
    * Customize when toast should be placed
    */
-  placement?: "top" | "bottom" | "center";
+  placement?: 'top' | 'bottom' | 'center' | 'top right';
 
   /**
    * Customize style of toast
@@ -59,7 +59,7 @@ export interface ToastOptions {
   /**
    * Customize how toast is animated when added or removed
    */
-  animationType?: "slide-in" | "zoom-in";
+  animationType?: 'slide-in' | 'zoom-in';
 
   /**
    * Customize success type icon
@@ -129,13 +129,13 @@ const Toast: FC<ToastProps> = (props) => {
     id,
     onDestroy,
     icon,
-    type = "normal",
+    type = 'normal',
     message,
     duration = 5000,
     style,
     textStyle,
     animationDuration = 250,
-    animationType = "slide-in",
+    animationType = 'slide-in',
     successIcon,
     dangerIcon,
     warningIcon,
@@ -158,10 +158,10 @@ const Toast: FC<ToastProps> = (props) => {
   useEffect(() => {
     Animated.timing(animation, {
       toValue: 1,
-      useNativeDriver: Platform.OS !== "web",
+      useNativeDriver: Platform.OS !== 'web',
       duration: animationDuration,
     }).start();
-    if (duration !== 0 && typeof duration === "number") {
+    if (duration !== 0 && typeof duration === 'number') {
       closeTimeoutRef.current = setTimeout(() => {
         handleClose();
       }, duration);
@@ -186,7 +186,7 @@ const Toast: FC<ToastProps> = (props) => {
   const handleClose = () => {
     Animated.timing(animation, {
       toValue: 0,
-      useNativeDriver: Platform.OS !== "web",
+      useNativeDriver: Platform.OS !== 'web',
       duration: animationDuration,
     }).start(() => onDestroy());
   };
@@ -194,7 +194,7 @@ const Toast: FC<ToastProps> = (props) => {
   const panReleaseToLeft = (gestureState: PanResponderGestureState) => {
     Animated.timing(getPanResponderAnim(), {
       toValue: { x: (-dims.width / 10) * 9, y: gestureState.dy },
-      useNativeDriver: Platform.OS !== "web",
+      useNativeDriver: Platform.OS !== 'web',
       duration: 250,
     }).start(() => onDestroy());
   };
@@ -202,14 +202,14 @@ const Toast: FC<ToastProps> = (props) => {
   const panReleaseToRight = (gestureState: PanResponderGestureState) => {
     Animated.timing(getPanResponderAnim(), {
       toValue: { x: (dims.width / 10) * 9, y: gestureState.dy },
-      useNativeDriver: Platform.OS !== "web",
+      useNativeDriver: Platform.OS !== 'web',
       duration: 250,
     }).start(() => onDestroy());
   };
 
   const getPanResponder = () => {
     if (panResponderRef.current) return panResponderRef.current;
-    const swipeThreshold = Platform.OS === "android" ? 10 : 0;
+    const swipeThreshold = Platform.OS === 'android' ? 10 : 0;
     panResponderRef.current = PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => {
         //return true if user is swiping, return false if it's a single click
@@ -232,7 +232,7 @@ const Toast: FC<ToastProps> = (props) => {
         } else {
           Animated.spring(getPanResponderAnim(), {
             toValue: { x: 0, y: 0 },
-            useNativeDriver: Platform.OS !== "web",
+            useNativeDriver: Platform.OS !== 'web',
           }).start();
         }
       },
@@ -248,20 +248,20 @@ const Toast: FC<ToastProps> = (props) => {
 
   if (icon === undefined) {
     switch (type) {
-      case "success": {
+      case 'success': {
         if (successIcon) {
           icon = successIcon;
         }
         break;
       }
 
-      case "danger": {
+      case 'danger': {
         if (dangerIcon) {
           icon = dangerIcon;
         }
         break;
       }
-      case "warning": {
+      case 'warning': {
         if (warningIcon) {
           icon = warningIcon;
         }
@@ -270,19 +270,19 @@ const Toast: FC<ToastProps> = (props) => {
     }
   }
 
-  let backgroundColor = "";
+  let backgroundColor = '';
   switch (type) {
-    case "success":
-      backgroundColor = successColor || "rgb(46, 125, 50)";
+    case 'success':
+      backgroundColor = successColor || 'rgb(46, 125, 50)';
       break;
-    case "danger":
-      backgroundColor = dangerColor || "rgb(211, 47, 47)";
+    case 'danger':
+      backgroundColor = dangerColor || 'rgb(211, 47, 47)';
       break;
-    case "warning":
-      backgroundColor = warningColor || "rgb(237, 108, 2)";
+    case 'warning':
+      backgroundColor = warningColor || 'rgb(237, 108, 2)';
       break;
     default:
-      backgroundColor = normalColor || "#333";
+      backgroundColor = normalColor || '#333';
   }
 
   const animationStyle: Animated.WithAnimatedObject<ViewStyle> = {
@@ -291,7 +291,7 @@ const Toast: FC<ToastProps> = (props) => {
       {
         translateY: animation.interpolate({
           inputRange: [0, 1],
-          outputRange: placement === "bottom" ? [20, 0] : [-20, 0], // 0 : 150, 0.5 : 75, 1 : 0
+          outputRange: placement === 'bottom' ? [20, 0] : [-20, 0], // 0 : 150, 0.5 : 75, 1 : 0
         }),
       },
     ],
@@ -303,7 +303,7 @@ const Toast: FC<ToastProps> = (props) => {
     );
   }
 
-  if (animationType === "zoom-in") {
+  if (animationType === 'zoom-in') {
     animationStyle.transform?.push({
       scale: animation.interpolate({
         inputRange: [0, 1],
@@ -314,7 +314,7 @@ const Toast: FC<ToastProps> = (props) => {
 
   return (
     <Animated.View
-      pointerEvents={"box-none"}
+      pointerEvents={'box-none'}
       ref={containerRef}
       {...(swipeEnabled ? getPanResponder().panHandlers : null)}
       style={[styles.container, animationStyle]}
@@ -324,10 +324,7 @@ const Toast: FC<ToastProps> = (props) => {
       ) : props.renderToast ? (
         props.renderToast(props)
       ) : (
-        <TouchableWithoutFeedback
-          disabled={!onPress}
-          onPress={() => onPress && onPress(id)}
-        >
+        <Pressable disabled={!onPress} onPress={() => onPress && onPress(id)}>
           <View
             style={[
               styles.toastContainer,
@@ -342,26 +339,26 @@ const Toast: FC<ToastProps> = (props) => {
               <Text style={[styles.message, textStyle]}>{message}</Text>
             )}
           </View>
-        </TouchableWithoutFeedback>
+        </Pressable>
       )}
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { width: "100%", alignItems: "center" },
+  container: { width: '100%', alignItems: 'center' },
   toastContainer: {
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderRadius: 5,
     marginVertical: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    overflow: "hidden",
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   message: {
-    color: "#fff",
-    fontWeight: "500",
+    color: '#fff',
+    fontWeight: '500',
   },
   iconContainer: {
     marginRight: 5,

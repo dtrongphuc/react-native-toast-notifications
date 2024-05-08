@@ -1,5 +1,5 @@
 {
-  "name": "react-native-toast-notifications",
+  "name": "@dtrongphuc/react-native-toast-notifications",
   "version": "3.4.0",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -11,10 +11,10 @@
   ],
   "license": "MIT",
   "author": {
-    "name": "Alireza Rezania",
-    "email": "alireza.rzna@gmail.com"
+    "name": "dtrongphuc",
+    "email": "dtrongphucdv@gmail.com"
   },
-  "homepage": "https://github.com/arnnis/react-native-toast-notifications#readme",
+  "homepage": "https://github.com/dtrongphuc/react-native-toast-notifications#readme",
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
